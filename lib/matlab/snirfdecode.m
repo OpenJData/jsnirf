@@ -37,8 +37,19 @@ end
 
 data=regrouph5(root, varargin{:});
 
-if(isfield(data,'nirs') && isfield(data,'formatVersion') && ~isfield(data,'SNIRFData'))
+issnirf=1;
+
+if(~isempty(varargin))
+    if(ischar(varargin{1}) && strcmpi(varargin{1},'jsnirf'))
+        issnirf=0;
+    end
+end
+
+if(issnirf==0 && isfield(data,'nirs') && isfield(data,'formatVersion') && ~isfield(data,'SNIRFData'))
     data.SNIRFData=data.nirs;
+    if(isfield(data.SNIRFData,'data') && isfield(data.SNIRFData.data,'measurementList'))
+        data.SNIRFData.data.measurementList=aos2soa(data.nirs.data.measurementList);
+    end
     if(iscell(data.nirs))
         for i=1:length(data.nirs)
             data.SNIRFData{i}.formatVersion=data.formatVersion;
